@@ -1,0 +1,74 @@
+apply plugin: 'com.android.application'
+
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+
+apply plugin: 'kotlin-kapt'
+
+android {
+    def globalConfiguration = rootProject.extensions.getByName("ext")
+
+    compileSdkVersion globalConfiguration["androidCompileSdkVersion"]
+    buildToolsVersion globalConfiguration["buildToolsVersion"]
+
+    defaultConfig {
+        applicationId globalConfiguration["androidApplicationId"]
+        minSdkVersion globalConfiguration["androidMinSdkVersion"]
+        targetSdkVersion globalConfiguration["androidTargetSdkVersion"]
+        versionCode globalConfiguration["androidVersionCode"]
+        versionName globalConfiguration["androidVersionName"]
+        testInstrumentationRunner globalConfiguration["testInstrumentationRunner"]
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions "default"
+    productFlavors {
+        production {
+            applicationId "com.bigbackboom.mvvm_sample"
+        }
+        develop {
+            applicationId "com.bigbackboom.mvvm_sample_develop"
+        }
+    }
+
+    dataBinding {
+        enabled = true
+    }
+}
+
+dependencies {
+    def appDependencies = rootProject.ext.appDependencies
+    def appTestDependencies = rootProject.ext.appTestDependencies
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation appDependencies.kotlinVersion
+    implementation appDependencies.androidxAppcompat
+    implementation appDependencies.androidxCoreKtx
+    implementation appDependencies.androidxCoreConstraintLayout
+    implementation appDependencies.androidMaterial
+    kapt appDependencies.dataBinding
+    testImplementation appTestDependencies.junit
+    androidTestImplementation appTestDependencies.androidxTest
+    androidTestImplementation appTestDependencies.androidxTestEspresso
+
+    // Architecture Components
+    implementation appDependencies.lifecycleExtensions
+    annotationProcessor appDependencies.lifecycleCompiler
+
+    // Retrofit
+    implementation appDependencies.retrofit
+    implementation appDependencies.retrofitConverterGson
+
+    // dagger
+    implementation appDependencies.dagger
+    implementation appDependencies.daggerAndroid
+    implementation appDependencies.daggerAndroidSupport
+    kapt appDependencies.daggerCompiler
+    kapt appDependencies.daggerProcessor
+}
